@@ -1,6 +1,6 @@
 # FiveM Ban Management System
 
-A simple ban management system for FiveM servers. Allows admins to ban/unban players using multiple identifiers, set custom durations, and automatically check bans when players join.
+A centralized ban management system for FiveM servers. Allows admins to ban/unban players using multiple identifiers, set custom durations, and automatically check bans when players join. Perfect for owners with multiple servers who want to keep them secure with bans stored in a shared database.
 
 ## Features
 
