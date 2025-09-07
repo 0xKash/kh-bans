@@ -6,3 +6,19 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Ban {
+  id          String   @id @default(cuid())
+  reason      String   @default("Default ban reason")
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime?
+
+  ip          String?   @unique
+  hardware    String?   @unique
+  steam       String?   @unique
+  discord     String?   @unique
+  xbl         String?   @unique
+  license     String?   @unique
+  license2    String?   @unique
+  fivem       String?   @unique
+}
