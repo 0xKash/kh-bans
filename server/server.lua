@@ -19,7 +19,11 @@ AddEventHandler("playerConnecting", function (name, setKickReason, deferrals)
             end
 
             if data.isExpired == false then
-                deferrals.done("You are banned: " .. (data.reason or "No reason provided"))
+                local banMessage = "You are banned: " .. (data.reason or "No reason provided")
+                if data.expiresAt then
+                    banMessage = banMessage .. ", expires " .. data.expiresAt:sub(1, 10)
+                end
+                deferrals.done(banMessage)
                 return
             else
                 deferrals.done()
@@ -43,14 +47,20 @@ RegisterCommand("kh-ban", function (source, args)
 
     local targetId = tonumber(args[1])
     local reason = table.concat(args, " ", 2)
-    local expiresAt
+    local duration = args[#args]
+
+    if Utils.parseDurationToISO(duration) then
+        reason = table.concat(args, " ", 2, #args - 1)
+    else
+        reason = table.concat(args, " ", 2)
+        duration = nil
+    end
 
     if not targetId  then
         if src ~= 0 then
-            TriggerClientEvent("chat:addMessage", src, { args = { "^1SYSTEM", "Usage: /ban [playerId] [reason]" } })
+            TriggerClientEvent("chat:addMessage", src, { args = { "^1SYSTEM", "Usage: /ban [playerId] [reason] [duration?]" } })
         else
-            print("^1SYSTEM: Usage: /ban [playerId] [reason]")
-            
+            print("^1SYSTEM: Usage: /ban [playerId] [reason] [duration?]")
         end
         return
     end
@@ -67,7 +77,7 @@ RegisterCommand("kh-ban", function (source, args)
     local identifiers = Utils.getPlayerIdentifiersObject(targetId)
     local body = {
         reason = reason or "No reason provided",
-        expiresAt = expiresAt or nil
+        expiresAt = Utils.parseDurationToISO(duration)
     }
 
     for key, value in pairs(identifiers) do
@@ -78,7 +88,7 @@ RegisterCommand("kh-ban", function (source, args)
         if status == 201 then
             local banMessage = "You have been banned: " .. body.reason
             if body.expiresAt then
-                banMessage = banMessage .. " (expires at " .. body.expiresAt .. ")"
+                banMessage = banMessage .. " (expires " .. body.expiresAt:sub(1, 10) .. ")"
             end
 
             DropPlayer(targetId, banMessage)

@@ -27,3 +27,24 @@ function Utils.getPlayerIdentifiersObject(source)
 
     return identifiers
 end
+
+function Utils.parseDurationToISO(str)
+   if not str then return nil end
+
+    local value, unit = str:match("^(%d+)([dmy])$")
+    if not value or not unit then return nil end
+
+    value = tonumber(value)
+
+    local seconds = 0
+    if unit == "d" then
+        seconds = value * 24 * 60 * 60
+    elseif unit == "m" then
+        seconds = value * 30 * 24 * 60 * 60
+    elseif unit == "y" then
+        seconds = value * 365 * 24 * 60 * 60
+    end
+
+    local unix = os.time() + seconds
+    return os.date("%Y-%m-%dT%H:%M:%SZ", unix)
+end
