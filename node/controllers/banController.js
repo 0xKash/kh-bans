@@ -87,6 +87,30 @@ exports.deleteBan = async (req, res) => {
   return res.json(ban);
 };
 
+exports.deleteBanByLicense = async (req, res) => {
+  const { license } = req.params;
+
+  if (!license)
+    throw new CustomBadRequestError(
+      "License is required",
+      { id: req.body.license },
+      "Provide a valid license in the request params",
+      req.originalUrl
+    );
+
+  const ban = await prisma.deleteBanByLicense(license);
+
+  if (!ban)
+    throw new CustomNotFoundError(
+      "Ban not found",
+      { ban },
+      "Ensure the provided ban ID exists in the database",
+      req.originalUrl
+    );
+
+  return res.json(ban);
+};
+
 exports.getBanByIdentifier = async (req, res) => {
   checkIdentifiers(req);
 

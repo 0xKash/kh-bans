@@ -61,3 +61,15 @@ exports.deleteBan = async (id) => {
     throw err;
   }
 };
+
+exports.deleteBanByLicense = async (license) => {
+  try {
+    return await prisma.ban.delete({
+      where: {
+        license,
+      },
+    });
+  } catch (err) {
+    console.error("Error deleting ban: ", err);
+  }
+};
