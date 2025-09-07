@@ -43,12 +43,38 @@ exports.getBanById = async (req, res) => {
   if (!banId)
     throw new CustomBadRequestError(
       "Ban ID is required",
-      { id: req.body.id },
-      "Provide a valid ban ID in the request body",
+      { id: req.params.id || null },
+      "Provide a valid ban ID in the request params",
       req.originalUrl
     );
 
   const ban = await prisma.getBanByid(banId);
+
+  if (!ban)
+    throw new CustomNotFoundError(
+      "Ban not found",
+      { id: req.params.id || null },
+      "Ensure the provided ban ID exists in the database",
+      req.originalUrl
+    );
+
+  if (!checkBanExpiration(ban)) prisma.deleteBan(ban.id);
+
+  return res.json({ ...ban, isExpired: false });
+};
+
+exports.deleteBan = async (req, res) => {
+  const { banId } = req.params;
+
+  if (!banId)
+    throw new CustomBadRequestError(
+      "Ban ID is required",
+      { id: req.body.id },
+      "Provide a valid ban ID in the request params",
+      req.originalUrl
+    );
+
+  const ban = await prisma.deleteBan(banId);
 
   if (!ban)
     throw new CustomNotFoundError(
@@ -58,9 +84,7 @@ exports.getBanById = async (req, res) => {
       req.originalUrl
     );
 
-  if (!checkBanExpiration(ban)) prisma.deleteBan(ban.id);
-
-  return res.json({ ...ban, isExpired: false });
+  return res.json(ban);
 };
 
 exports.getBanByIdentifier = async (req, res) => {
