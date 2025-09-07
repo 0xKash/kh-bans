@@ -107,3 +107,40 @@ RegisterCommand("kh-ban", function (source, args)
         end
     end, 'POST', json.encode(body), { ["Content-Type"] = "application/json" })
 end, false)
+
+RegisterCommand("kh-unban", function (source, args)
+    local src = source
+
+    if src ~= 0 and not IsPlayerAceAllowed(src, "admin") then
+        TriggerClientEvent("chat:addMessage", src, { args = { "^1SYSTEM", "You do not have permission" } })
+        return
+    end
+
+    local license = args[1]
+
+    if not license then
+        if src ~= 0 then
+            TriggerClientEvent("chat:addMessage", src, { args = { "^1SYSTEM", "Usage: /unban [license]" } })
+        else
+            print("^1SYSTEM: Usage: /unban [license]")
+        end
+        return
+    end
+
+    PerformHttpRequest("http://localhost:3000/bans/license/" .. license, function (status, response)
+        if status == 200 then
+            local unbanMessage = license .." has been unbanned"
+            if src ~= 0 then
+                TriggerClientEvent("chat:addMessage", src, { args = { "^2SYSTEM", unbanMessage } })
+            else
+                print("^2SYSTEM:", unbanMessage)
+            end 
+        else
+            if src ~= 0 then
+                TriggerClientEvent("chat:addMessage", src, { args = { "^1SYSTEM", "Error unbanning player: " .. response } })
+            else
+                print("^1SYSTEM: Error unbanning player: " .. tostring(response))
+            end
+        end
+    end, 'DELETE')
+end, false)
