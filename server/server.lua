@@ -1,14 +1,11 @@
-local utils = require('utils')
-
 AddEventHandler("playerConnecting", function (name, setKickReason, deferrals)
     local src = source
     deferrals.defer()
     deferrals.update("Checking bans...")
 
-    local identifiers = utils.getPlayerIdentifiersObject(src)
+    local identifiers = Utils.getPlayerIdentifiersObject(src)
 
     PerformHttpRequest('http://localhost:3000/ban/identifiers', function (status, response)
-
         if status == 404 then
             -- NO BAN 
             deferrals.done()
