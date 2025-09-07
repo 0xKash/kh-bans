@@ -6,6 +6,7 @@ description 'Centralized ban management system'
 version '1.0.0'
 
 server_scripts {
+    'server/utils.lua',
     'server/server.lua'
 }
 
